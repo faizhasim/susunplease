@@ -1,9 +1,11 @@
-package susun
+package service
 
 import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/faizhasim/susunplease/internal/model"
+	"github.com/mitchellh/go-homedir"
 	"os"
 	"regexp"
 )
@@ -14,16 +16,16 @@ const (
 	MatchRegex   = "matchRegex"
 )
 
-type Rule struct {
-	DocumentType string
-	TargetDir    string
-	MatchRegex   *regexp.Regexp
+type RulesParser interface {
+	ParseRulesFromCsv(path string) ([]model.Rule, error)
+	MatchRule(rules []model.Rule, content string) (model.Rule, bool)
+	GetCsvPath() (string, error)
 }
 
-type HeaderPos map[string]int
+type rulesParser struct{}
 
-func headerPos(entries [][]string) (HeaderPos, error) {
-	headerPos := make(HeaderPos, 3)
+func headerPos(entries [][]string) (map[string]int, error) {
+	headerPos := make(map[string]int, 3)
 	for i, header := range entries[0] {
 		switch header {
 		case DocumentType:
@@ -39,10 +41,10 @@ func headerPos(entries [][]string) (HeaderPos, error) {
 	return headerPos, nil
 }
 
-func entriesToRules(entries [][]string, pos HeaderPos) []Rule {
-	var rules []Rule
+func entriesToRules(entries [][]string, pos map[string]int) []model.Rule {
+	var rules []model.Rule
 	for _, entry := range entries[1:] {
-		rule := Rule{
+		rule := model.Rule{
 			DocumentType: entry[pos[DocumentType]],
 			TargetDir:    entry[pos[TargetDir]],
 			MatchRegex:   regexp.MustCompile("(?i)" + entry[pos[MatchRegex]]),
@@ -52,7 +54,7 @@ func entriesToRules(entries [][]string, pos HeaderPos) []Rule {
 	return rules
 }
 
-func ParseRulesFromCsv(path string) ([]Rule, error) {
+func (rulesParser *rulesParser) ParseRulesFromCsv(path string) ([]model.Rule, error) {
 	f, err := os.Open(path)
 	defer f.Close()
 	if err != nil {
@@ -81,11 +83,23 @@ func ParseRulesFromCsv(path string) ([]Rule, error) {
 	return entriesToRules(entries, pos), nil
 }
 
-func MatchRule(rules []Rule, content string) (Rule, bool) {
+func (rulesParser *rulesParser) MatchRule(rules []model.Rule, content string) (model.Rule, bool) {
 	for _, rule := range rules {
 		if rule.MatchRegex.MatchString(content) {
 			return rule, true
 		}
 	}
-	return Rule{}, false
+	return model.Rule{}, false
+}
+
+func (rulesParser *rulesParser) GetCsvPath() (string, error) {
+	h, err := homedir.Dir()
+	if err != nil {
+		return "", err
+	}
+	return h + "/.susun/rules.csv", nil
+}
+
+func NewRulesParser() RulesParser {
+	return &rulesParser{}
 }

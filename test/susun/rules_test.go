@@ -1,14 +1,16 @@
 package susun_test
 
 import (
-	"github.com/faizhasim/susunplease/pkg/susun"
+	"github.com/faizhasim/susunplease/internal/module"
+	"github.com/faizhasim/susunplease/internal/service"
 	"github.com/stretchr/testify/assert"
 	"regexp"
 	"testing"
 )
 
 func TestReadingRules(t *testing.T) {
-	records, err := susun.ParseRulesFromCsv("testdata/rules.csv")
+	m := &module.SusunPdf{RulesParser: service.NewRulesParser()}
+	records, err := m.ParseRulesFromCsv("testdata/rules.csv")
 	if err != nil {
 		t.Error(err)
 	}

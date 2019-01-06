@@ -1,7 +1,7 @@
 package susun_test
 
 import (
-	"github.com/faizhasim/susunplease/pkg/susun"
+	"github.com/faizhasim/susunplease/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -14,7 +14,7 @@ func testFromSample(t *testing.T, sample string, expectedIsoDate string) {
 		panic(err)
 	}
 
-	tm, err := susun.ParseTimes(sample)
+	tm, err := utils.ParseTimes(sample)
 	if err != nil {
 		if expectNoResults {
 			assert.Error(t, err)

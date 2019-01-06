@@ -13,3 +13,15 @@
 [[constraint]]
   name = "github.com/panjf2000/ants"
   version = "3.9.4"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.3"
+
+[[constraint]]
+  name = "github.com/mitchellh/go-homedir"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/skratchdot/open-golang"

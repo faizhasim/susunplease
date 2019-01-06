@@ -1,4 +1,4 @@
-package susun
+package utils
 
 import (
 	"errors"

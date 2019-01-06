@@ -9,5 +9,5 @@ jobs:
       - checkout
       - run: dep ensure
       - run: go test -v ./...
-      - run: pushd cmd && go build -o susun
+      - run: pushd cmd/susun && go build -o susun
       - run: go get github.com/faizhasim/susunplease/cmd/susun
